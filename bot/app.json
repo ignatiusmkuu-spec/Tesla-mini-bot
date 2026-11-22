@@ -1,1 +1,66 @@
-{"name":"Tesla Mini Bot","description":"Modular WhatsApp bot with persistent PostgreSQL auth storage. Requires an external PostgreSQL DATABASE_URL.","keywords":["whatsapp","baileys","bot"],"env":{"DATABASE_URL":{"description":"Persistent PostgreSQL connection string. Required; dyno filesystem is ephemeral.","required":true},"OWNER_NUMBERS":{"description":"Comma-separated owner numbers in international digits-only format.","required":true},"PAIRING_NUMBER":{"description":"Optional owner phone number in international digits only; set once to print a WhatsApp pairing code in worker logs.","required":false},"BOT_MODE":{"description":"public or private","value":"private"},"PREFIX":{"description":"Command prefix","value":"."},"OPENAI_API_KEY":{"description":"Enables AI chat, image generation, text-to-speech and transcription.","required":false},"OPENWEATHER_API_KEY":{"description":"Enables weather command.","required":false},"TAVILY_API_KEY":{"description":"Enables web and video search.","required":false},"DEEPL_API_KEY":{"description":"Enables translation integration.","required":false},"MEDIA_PROVIDER_URL":{"description":"Trusted compatible HTTPS media download API.","required":false},"MEDIA_PROVIDER_KEY":{"description":"Key for the configured media download provider.","required":false},"HEROKU_DEPLOY_WEBHOOK":{"description":"HTTPS deployment pipeline hook for .updatebot.","required":false}},"formation":{"worker":{"quantity":1,"size":"basic"}},"stack":"heroku-24"}
+{
+  "name": "Tesla Mini Bot",
+  "description": "Modular WhatsApp bot with persistent PostgreSQL auth storage. Requires an external PostgreSQL DATABASE_URL.",
+  "keywords": ["whatsapp", "baileys", "bot"],
+  "env": {
+    "DATABASE_URL": {
+      "description": "Persistent PostgreSQL connection string. Required; dyno filesystem is ephemeral.",
+      "required": true
+    },
+    "OWNER_NUMBERS": {
+      "description": "Comma-separated owner numbers in international digits-only format.",
+      "required": true
+    },
+    "PAIRING_NUMBER": {
+      "description": "Optional owner phone number in international digits only; set once to print a WhatsApp pairing code in worker logs.",
+      "required": false
+    },
+    "BOT_MODE": {
+      "description": "public or private",
+      "value": "private"
+    },
+    "PREFIX": {
+      "description": "Command prefix",
+      "value": "."
+    },
+    "OPENAI_API_KEY": {
+      "description": "Enables AI chat, image generation, text-to-speech and transcription.",
+      "required": false
+    },
+    "OPENAI_CHAT_MODEL": {
+      "description": "Optional OpenAI-compatible chat model override.",
+      "value": "gpt-4o-mini"
+    },
+    "OPENWEATHER_API_KEY": {
+      "description": "Enables weather command.",
+      "required": false
+    },
+    "TAVILY_API_KEY": {
+      "description": "Enables web and video search.",
+      "required": false
+    },
+    "DEEPL_API_KEY": {
+      "description": "Enables translation integration.",
+      "required": false
+    },
+    "MEDIA_PROVIDER_URL": {
+      "description": "Trusted compatible HTTPS media download API.",
+      "required": false
+    },
+    "MEDIA_PROVIDER_KEY": {
+      "description": "Key for the configured media download provider.",
+      "required": false
+    },
+    "HEROKU_DEPLOY_WEBHOOK": {
+      "description": "HTTPS deployment pipeline hook for .updatebot.",
+      "required": false
+    }
+  },
+  "formation": {
+    "worker": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "stack": "heroku-24"
+}

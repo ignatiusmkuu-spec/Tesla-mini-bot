@@ -23,11 +23,11 @@ Set `PAIRING_NUMBER` to the owner's international phone number using digits only
 ## Heroku deployment
 
 1. Create a Heroku app and provision a persistent PostgreSQL database (Heroku Postgres or another managed PostgreSQL service). Add its URI as `DATABASE_URL`; verify SSL/network policy for the provider. Heroku Postgres add-on availability and pricing vary.
-2. Deploy this directory/repository as the app root. `Procfile` starts `worker: node index.js`; `app.json` documents the worker formation and config vars. Set `OWNER_NUMBERS` and `BOT_MODE=private` in Heroku Config Vars.
+2. Deploy the GitHub repository root, not the `bot/` subdirectory. The root `app.json` defines the Heroku config vars and worker formation, the root `Procfile` starts `npm --prefix bot start`, and `heroku-postbuild` installs production dependencies from `bot/package-lock.json`.
 3. For first pairing, set `PAIRING_NUMBER`, scale one worker, and read its logs for the pairing code. Link the account, then remove `PAIRING_NUMBER` and restart the worker. Reconnection uses exponential backoff; logged-out sessions require a fresh pairing.
 4. Ensure the PostgreSQL service has backups and appropriate access controls. The local `/tmp` or project directory is never used as persistent auth storage.
 
-Heroku's filesystem is temporary, so a database add-on/external database is mandatory for durable sessions. The app is a worker, not a public web endpoint. `app.json` contains an example repository URL; replace it with your GitHub URL before publishing the manifest. Do not commit `.env` or credentials.
+Heroku's filesystem is temporary, so a database add-on/external database is mandatory for durable sessions. The bot app runs as a worker; it is not a public web endpoint. The root manifest points to [the public GitHub repository](https://github.com/ignatiusmkuu-spec/Tesla-mini-bot) and prompts for required config vars. Do not commit `.env` or credentials.
 
 ## Environment variables
 

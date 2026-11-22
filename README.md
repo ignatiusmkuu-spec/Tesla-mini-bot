@@ -5,7 +5,9 @@
 <p align="center">
   <a href="https://pair-tesla-md.onrender.com/heroku"><strong>⚡ Pair now</strong></a>
   &nbsp; · &nbsp;
-  <a href="#heroku-deployment"><strong>Deploy to Heroku — setup guide</strong></a>
+  <a href="https://heroku.com/deploy?template=https://github.com/ignatiusmkuu-spec/Tesla-mini-bot" target="_blank" rel="noopener noreferrer"><strong>Deploy to Heroku</strong></a>
+  &nbsp; · &nbsp;
+  <a href="#heroku-deployment"><strong>Setup guide</strong></a>
 </p>
 
 A modular WhatsApp automation bot with interactive menus, owner controls, provider-backed tools and PostgreSQL-backed session storage. The supplied video is sent with the bot's welcome menu.
@@ -52,9 +54,9 @@ The site listens on `PORT` or 3000. `GET /healthz` is a health endpoint, and `/t
 
 ## Heroku deployment
 
-The button above links to the included deployment instructions in [`bot/README.md`](bot/README.md). The bot uses Heroku's `worker` process and requires durable PostgreSQL for its WhatsApp auth state—dyno local storage is ephemeral. Configure `DATABASE_URL`, `OWNER_NUMBERS`, pair through worker logs, and see the detailed environment-variable guide before enabling the worker.
+The Heroku button deploys from the repository root, where `app.json` declares required and optional config vars and the worker formation. The root `Procfile` starts the bot in `bot/`; the root build installs its locked dependencies. Durable PostgreSQL is required because dyno storage is ephemeral. Review [`bot/README.md`](bot/README.md) before pairing.
 
-The complete website and bot source are publicly available at [`ignatiusmkuu-spec/Tesla-mini-bot`](https://github.com/ignatiusmkuu-spec/Tesla-mini-bot). This README links to the deployment guide rather than a one-click Heroku deploy action; use the steps in [`bot/README.md`](bot/README.md) and configure durable PostgreSQL before starting the worker.
+The public source is [`ignatiusmkuu-spec/Tesla-mini-bot`](https://github.com/ignatiusmkuu-spec/Tesla-mini-bot). Heroku's setup flow asks for `DATABASE_URL` and `OWNER_NUMBERS`; provide a durable PostgreSQL URI and keep all credentials in Heroku Config Vars, never in source control.
 
 ## Files
 

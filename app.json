@@ -1,0 +1,67 @@
+{
+  "name": "TESLA MINI BOT",
+  "description": "Modular WhatsApp bot worker with PostgreSQL-backed sessions. Requires a durable PostgreSQL DATABASE_URL.",
+  "repository": "https://github.com/ignatiusmkuu-spec/Tesla-mini-bot",
+  "keywords": ["whatsapp", "baileys", "bot"],
+  "env": {
+    "DATABASE_URL": {
+      "description": "Persistent PostgreSQL connection string. Required; Heroku dyno storage is ephemeral.",
+      "required": true
+    },
+    "OWNER_NUMBERS": {
+      "description": "Comma-separated WhatsApp owner numbers in international digits-only format.",
+      "required": true
+    },
+    "PAIRING_NUMBER": {
+      "description": "Optional owner phone number in international digits only; set for first pairing, then remove.",
+      "required": false
+    },
+    "BOT_MODE": {
+      "description": "public or private",
+      "value": "private"
+    },
+    "PREFIX": {
+      "description": "Command prefix",
+      "value": "."
+    },
+    "OPENAI_API_KEY": {
+      "description": "Optional: enables AI chat, image generation, text-to-speech and transcription.",
+      "required": false
+    },
+    "OPENAI_CHAT_MODEL": {
+      "description": "Optional OpenAI-compatible chat model override.",
+      "value": "gpt-4o-mini"
+    },
+    "OPENWEATHER_API_KEY": {
+      "description": "Optional: enables the weather command.",
+      "required": false
+    },
+    "TAVILY_API_KEY": {
+      "description": "Optional: enables web and video search.",
+      "required": false
+    },
+    "DEEPL_API_KEY": {
+      "description": "Optional: enables translation.",
+      "required": false
+    },
+    "MEDIA_PROVIDER_URL": {
+      "description": "Optional trusted HTTPS media-download API endpoint.",
+      "required": false
+    },
+    "MEDIA_PROVIDER_KEY": {
+      "description": "Optional key for the configured media-download provider.",
+      "required": false
+    },
+    "HEROKU_DEPLOY_WEBHOOK": {
+      "description": "Optional HTTPS deployment-pipeline hook used by .updatebot.",
+      "required": false
+    }
+  },
+  "formation": {
+    "worker": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "stack": "heroku-24"
+}
