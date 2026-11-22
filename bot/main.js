@@ -28,12 +28,66 @@ async function handle(sock,msg){if(!msg.message||msg.key.fromMe)return;const jid
  await sock.sendMessage(jid,{text:`Unknown command .${command}. Send .help for the menu.`});
 }
 let retryTimer;
-async function connect(){if(closing)return;const auth=await usePostgresAuthState();sock=makeWASocket({auth:auth.state,logger:pino({level:'silent'}),browser:Browsers.ubuntu('Chrome'),markOnlineOnConnect:false,syncFullHistory:false});sock.ev.on('creds.update',()=>auth.saveCreds().catch(e=>console.error('Auth save failed:',e.message)));
- sock.ev.on('messages.upsert',({messages,type})=>{if(type==='notify')for(const msg of messages)handle(sock,msg).catch(e=>console.error('Message handler error:',e.stack||e.message));});
- sock.ev.on('messages.update',async updates=>{for(const u of updates){const revoke=u.update?.message?.protocolMessage;if(revoke?.type===0){const p=plugins.find(x=>x.enabled&&x.onDelete);if(p)await p.onDelete({sock,key:revoke.key,jid:u.key.remoteJid}).catch(e=>console.error('Antidelete handler:',e.message));}}});
- sock.ev.on('group-participants.update',async update=>{for(const p of plugins.filter(x=>x.enabled&&x.onParticipants))await p.onParticipants({sock,...update}).catch(e=>console.error('Group participant handler:',e.message));});
- sock.ev.on('connection.update',async update=>{const {connection,lastDisconnect}=update;if(connection==='open'){retry=0;console.log('WhatsApp connection established.');}if(connection==='close'&&!closing){const status=lastDisconnect?.error?.output?.statusCode;if(status===DisconnectReason.loggedOut){console.error('WhatsApp logged out. Re-pair by setting PAIRING_NUMBER.');return;}retry=Math.min(retry+1,8);const delay=Math.min(1000*2**retry,60000);console.warn(`WhatsApp disconnected (${status||'unknown'}); reconnecting in ${delay}ms.`);clearTimeout(retryTimer);retryTimer=setTimeout(()=>connect().catch(e=>console.error('Reconnect failed:',e.message)),delay);}});
- if(config.pairingNumber&&!auth.state.creds.registered){try{const code=await sock.requestPairingCode(config.pairingNumber);console.log(`WhatsApp pairing code: ${code} — enter it in Linked devices. Remove PAIRING_NUMBER after pairing.`);}catch(e){console.error('Could not request pairing code:',e.message);}}
+async function connect() {
+  if (closing) return;
+  const auth = await usePostgresAuthState();
+  if (!auth.state.creds.registered && !config.pairingNumber) {
+    throw new Error('No linked WhatsApp session found. Set PAIRING_NUMBER, restart the worker, and complete first-time linking.');
+  }
+  sock = makeWASocket({
+    auth: auth.state,
+    logger: pino({ level: 'silent' }),
+    browser: Browsers.ubuntu('Chrome'),
+    markOnlineOnConnect: false,
+    syncFullHistory: false
+  });
+  sock.ev.on('creds.update', () => auth.saveCreds().catch(e => console.error('Auth save failed:', e.message)));
+  sock.ev.on('messages.upsert', ({ messages, type }) => {
+    if (type === 'notify') {
+      for (const msg of messages) handle(sock, msg).catch(e => console.error('Message handler error:', e.stack || e.message));
+    }
+  });
+  sock.ev.on('messages.update', async updates => {
+    for (const u of updates) {
+      const revoke = u.update?.message?.protocolMessage;
+      if (revoke?.type === 0) {
+        const p = plugins.find(x => x.enabled && x.onDelete);
+        if (p) await p.onDelete({ sock, key: revoke.key, jid: u.key.remoteJid }).catch(e => console.error('Antidelete handler:', e.message));
+      }
+    }
+  });
+  sock.ev.on('group-participants.update', async update => {
+    for (const p of plugins.filter(x => x.enabled && x.onParticipants)) {
+      await p.onParticipants({ sock, ...update }).catch(e => console.error('Group participant handler:', e.message));
+    }
+  });
+  sock.ev.on('connection.update', async update => {
+    const { connection, lastDisconnect } = update;
+    if (connection === 'open') {
+      retry = 0;
+      console.log('WhatsApp connection established.');
+    }
+    if (connection === 'close' && !closing) {
+      const status = lastDisconnect?.error?.output?.statusCode;
+      if (status === DisconnectReason.loggedOut) {
+        console.error('WhatsApp logged out. Re-pair by setting PAIRING_NUMBER.');
+        return;
+      }
+      retry = Math.min(retry + 1, 8);
+      const delay = Math.min(1000 * 2 ** retry, 60000);
+      console.warn(`WhatsApp disconnected (${status || 'unknown'}); reconnecting in ${delay}ms.`);
+      clearTimeout(retryTimer);
+      retryTimer = setTimeout(() => connect().catch(e => console.error('Reconnect failed:', e.message)), delay);
+    }
+  });
+  if (config.pairingNumber && !auth.state.creds.registered) {
+    try {
+      const code = await sock.requestPairingCode(config.pairingNumber);
+      console.log(`WhatsApp pairing code: ${code} — enter it in Linked devices. Remove PAIRING_NUMBER after pairing.`);
+    } catch (e) {
+      throw new Error(`Could not request WhatsApp pairing code: ${e.message}`);
+    }
+  }
 }
 async function shutdown(){if(closing)return;closing=true;clearTimeout(retryTimer);try{sock?.end(new Error('Process shutdown'));}catch{}await closeDb().catch(()=>{});process.exit(0);}
 for(const s of ['SIGTERM','SIGINT'])process.once(s,shutdown);
