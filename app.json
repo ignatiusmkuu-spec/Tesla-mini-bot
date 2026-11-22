@@ -11,6 +11,10 @@
     "PAIRING_NUMBER": {
       "description": "Optional phone number in international digits only; used only for the first WhatsApp pairing.",
       "required": false
+    },
+    "SESSION_ID": {
+      "description": "Optional PostgreSQL auth-session namespace. Leave unset to reuse the existing default session; set a stable label to isolate another linked WhatsApp session.",
+      "required": false
     }
   },
   "formation": {
