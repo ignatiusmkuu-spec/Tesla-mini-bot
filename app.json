@@ -15,6 +15,10 @@
     "SESSION_ID": {
       "description": "Optional PostgreSQL auth-session namespace. Leave unset to reuse the existing default session; set a stable label to isolate another linked WhatsApp session.",
       "required": false
+    },
+    "AUTO_REPLY": {
+      "description": "Optional. Set to true to enable AI replies to incoming text in direct WhatsApp chats; requires OPENAI_API_KEY in Config Vars.",
+      "required": false
     }
   },
   "formation": {

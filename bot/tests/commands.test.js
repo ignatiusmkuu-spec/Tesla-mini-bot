@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5432/test';
 process.env.OWNER_NUMBERS ||= '15551234567';
+process.env.AUTO_REPLY='false';
 for(const key of ['OPENAI_API_KEY','OPENWEATHER_API_KEY','TAVILY_API_KEY','DEEPL_API_KEY','MEDIA_PROVIDER_URL','MEDIA_PROVIDER_KEY'])delete process.env[key];
 const modules=await Promise.all(['../plugins/smart-tools.js','../plugins/search-media.js','../plugins/groups-automation.js','../plugins/owner.js'].map(x=>import(x)));
 const commands=Object.assign({},...modules.map(m=>m.default.commands));
