@@ -22,12 +22,12 @@ Set `PAIRING_NUMBER` to the owner's international phone number using digits only
 
 ## Heroku deployment
 
-1. Create a Heroku app and provision a persistent PostgreSQL database (Heroku Postgres or another managed PostgreSQL service). Add its URI as `DATABASE_URL`; verify SSL/network policy for the provider. Heroku Postgres add-on availability and pricing vary.
-2. Deploy the GitHub repository root, not the `bot/` subdirectory. The root `app.json` defines the Heroku config vars and worker formation, the root `Procfile` starts `npm --prefix bot start`, and `heroku-postbuild` installs production dependencies from `bot/package-lock.json`.
-3. For first pairing, set `PAIRING_NUMBER`, scale one worker, and read its logs for the pairing code. Link the account, then remove `PAIRING_NUMBER` and restart the worker. Reconnection uses exponential backoff; logged-out sessions require a fresh pairing.
+1. Provision a persistent PostgreSQL database (Heroku Postgres or another managed service) and keep its URI ready. Pricing and availability vary by provider.
+2. Deploy the GitHub repository root, not the `bot/` subdirectory. The Heroku setup form asks for `OWNER_NUMBERS` and optional `PAIRING_NUMBER`; the root `Procfile` starts `npm --prefix bot start`, and `heroku-postbuild` installs production dependencies from `bot/package-lock.json`.
+3. In Heroku Settings → Config Vars, add `DATABASE_URL` before enabling/restarting the worker. For first pairing, set `PAIRING_NUMBER`, read the worker logs for the short-lived code, link the account, then remove `PAIRING_NUMBER` and restart. Reconnection uses exponential backoff; logged-out sessions require a fresh pairing.
 4. Ensure the PostgreSQL service has backups and appropriate access controls. The local `/tmp` or project directory is never used as persistent auth storage.
 
-Heroku's filesystem is temporary, so a database add-on/external database is mandatory for durable sessions. The bot app runs as a worker; it is not a public web endpoint. The root manifest points to [the public GitHub repository](https://github.com/ignatiusmkuu-spec/Tesla-mini-bot) and prompts for required config vars. Do not commit `.env` or credentials.
+Heroku's filesystem is temporary, so durable PostgreSQL is mandatory. `DATABASE_URL` is intentionally omitted from the setup form because you will add it separately in Heroku Config Vars. The WhatsApp auth session is stored in PostgreSQL; there is no `SESSION_ID` variable. `PAIRING_NUMBER` is only the phone number used for first-time linking. Optional provider keys in the table can be added to Config Vars when needed. Do not commit `.env` or credentials.
 
 ## Environment variables
 
