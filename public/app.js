@@ -1,0 +1,1 @@
+document.querySelectorAll('a[download]').forEach(link=>link.addEventListener('click',()=>{const label=link.textContent.trim();link.setAttribute('aria-label',`${label}, downloading TESLA MINI BOT source archive`)}));

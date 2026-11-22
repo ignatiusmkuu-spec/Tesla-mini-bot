@@ -1,0 +1,8 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {mainItems,sections,welcome,sendMenu,actionMap} from '../lib/menus.js';
+const ids=[...mainItems.map((_,i)=>`tesla:item:root:${i}`),...Object.entries(sections).flatMap(([scope,s])=>[['Back','home'],...s.items].map((_,i)=>`tesla:item:${scope}:${i}`))];
+test('every interactive button instance has its own stable unique ID',()=>{assert.equal(new Set(ids).size,ids.length);assert.ok(ids.every(x=>/^tesla:item:[a-z]+:\d+$/.test(x)));});
+test('all seven categories and expected menu actions exist',()=>{assert.deepEqual(Object.keys(sections),['ai','music','search','tools','groups','settings','owner']);assert.equal(mainItems.length,7);});
+test('welcome includes the requested bot identity and features',()=>{const text=welcome('Ignatius');for(const phrase of ['TESLA MINI BOT','Hello, Ignatius','Intelligent WhatsApp Assistant','Interactive Button System','Advanced Plugin Architecture','Fast & Powerful Automation','Select an option below'])assert.ok(text.includes(phrase),phrase);});
+test('main menu uses an interactive list and falls back to typed unique IDs',async()=>{let sent;const sock={sendMessage:async(_jid,payload)=>{sent=payload;return payload}};await sendMenu(sock,'x@s.whatsapp.net','TESLA',mainItems,'root');assert.equal(sent.sections[0].rows.length,7);assert.equal(new Set(sent.sections[0].rows.map(x=>x.rowId)).size,7);for(const row of sent.sections[0].rows)assert.ok(actionMap.has(row.rowId));let calls=0;const failing={sendMessage:async(_jid,payload)=>{sent=payload;calls++;if(calls===1)throw new Error('unsupported');return payload}};await sendMenu(failing,'x@s.whatsapp.net','TESLA',mainItems,'fallback');assert.match(sent.text,/tesla:item:fallback:0/);});

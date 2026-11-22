@@ -1,0 +1,14 @@
+import express from 'express';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { access, stat } from 'node:fs/promises';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const app=express();
+app.disable('x-powered-by');
+app.get('/healthz',(_req,res)=>res.status(200).json({ok:true,service:'tesla-mini-bot-site'}));
+app.get('/manus-routes.json',(_req,res)=>res.json({routes:[{path:'/',title:'TESLA MINI BOT'}]}));
+app.get('/tesla-mini-bot.zip',async(_req,res,next)=>{const archive=path.join(root,'public','tesla-mini-bot.zip');try{await access(archive);const info=await stat(archive);res.set({'Content-Type':'application/zip','Content-Length':String(info.size),'Content-Disposition':'attachment; filename="tesla-mini-bot.zip"','Cache-Control':'no-store'});res.sendFile(archive)}catch(e){next(e)}});
+app.use(express.static(path.join(root,'public'),{index:'index.html',fallthrough:false,maxAge:'1h'}));
+app.use((err,_req,res,_next)=>{console.error(err);res.status(err.status===404?404:500).send(err.status===404?'Not found':'Request failed');});
+const port=Number(process.env.PORT)||3000;
+app.listen(port,'0.0.0.0',()=>console.log(`TESLA MINI BOT website listening on ${port}`));
