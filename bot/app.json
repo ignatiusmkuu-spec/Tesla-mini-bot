@@ -12,7 +12,7 @@
       "required": false
     },
     "SESSION_ID": {
-      "description": "Optional PostgreSQL auth-session namespace. Leave unset to reuse the existing default session; set a stable label to isolate another linked WhatsApp session.",
+      "description": "Optional PostgreSQL auth-session namespace. Accepts 1-64 letters, numbers, spaces, underscores, or hyphens (for example, tesla md). Leave unset to reuse the existing default session; changing it selects another unpaired session.",
       "required": false
     },
     "AUTO_REPLY": {

@@ -35,6 +35,12 @@ test('SESSION_ID selects a separate stable auth namespace', () => {
   assert.deepEqual(JSON.parse(result.stdout), { sessionId: 'tesla_wa-2', authNamespace: 'auth:tesla_wa-2', autoReply: false });
 });
 
+test('SESSION_ID accepts a label beginning with tesla md', () => {
+  const result = loadConfig('tesla md');
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(JSON.parse(result.stdout), { sessionId: 'tesla md', authNamespace: 'auth:tesla md', autoReply: false });
+});
+
 test('SESSION_ID rejects namespace separators and values longer than 64 characters', () => {
   for (const value of ['bad:value', 'x'.repeat(65)]) {
     const result = loadConfig(value);

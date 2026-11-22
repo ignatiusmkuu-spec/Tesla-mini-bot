@@ -4,8 +4,8 @@ const list = (value = '') => value.split(',').map(item => item.trim()).filter(Bo
 const sessionId = (process.env.SESSION_ID || '').trim();
 const autoReplyValue = (process.env.AUTO_REPLY || 'false').trim().toLowerCase();
 
-if (sessionId && !/^[A-Za-z0-9_-]{1,64}$/.test(sessionId)) {
-  throw new Error('SESSION_ID must be 1–64 letters, numbers, underscores, or hyphens.');
+if (sessionId && !/^[A-Za-z0-9 _-]{1,64}$/.test(sessionId)) {
+  throw new Error('SESSION_ID must be 1–64 letters, numbers, spaces, underscores, or hyphens.');
 }
 if (!['true', 'false'].includes(autoReplyValue)) {
   throw new Error('AUTO_REPLY must be true or false.');

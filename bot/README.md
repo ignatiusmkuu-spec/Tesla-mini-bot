@@ -27,7 +27,7 @@ Set `PAIRING_NUMBER` to the owner's international phone number using digits only
 3. In Heroku Settings → Config Vars, add `DATABASE_URL`. The root `Procfile` declares `web: npm start` for the website and `worker: npm --prefix bot start` for WhatsApp; `web.1` logs only confirm the website is running. New installs keep the worker at zero dynos until the database is ready; then set the worker dyno count to 1 in the Resources tab. This initial formation applies only when an app is created, so scale the worker manually on existing apps after the database and owner settings are ready. A worker dyno may incur Heroku charges. For first pairing, set `PAIRING_NUMBER`, read the worker logs for the short-lived code, link the account, then remove `PAIRING_NUMBER` and restart. Test `.ping` from a number in `OWNER_NUMBERS`; the default `BOT_MODE=private` keeps commands owner-only. Reconnection uses exponential backoff; logged-out sessions require a fresh pairing.
 4. Ensure the PostgreSQL service has backups and appropriate access controls. The local `/tmp` or project directory is never used as persistent auth storage.
 
-Heroku's filesystem is temporary, so durable PostgreSQL is mandatory. `DATABASE_URL` is intentionally omitted from the setup form because you will add it separately in Heroku Config Vars. WhatsApp auth is stored in PostgreSQL. `SESSION_ID` is an optional, non-secret namespace label: leave it unset to keep using the legacy default session, or set a stable value to isolate another linked session. Set it before pairing; changing it selects a different, initially unpaired session. `PAIRING_NUMBER` is only the phone number used for first-time linking. Optional provider keys in the table can be added to Config Vars when needed. Do not commit `.env` or credentials.
+Heroku's filesystem is temporary, so durable PostgreSQL is mandatory. `DATABASE_URL` is intentionally omitted from the setup form because you will add it separately in Heroku Config Vars. WhatsApp auth is stored in PostgreSQL. `SESSION_ID` is an optional, non-secret namespace label: leave it unset to keep using the legacy default session, or set a stable value to isolate another linked session. It accepts 1–64 letters, numbers, spaces, underscores, or hyphens (for example, `tesla md`). Set it before pairing; changing it selects a different, initially unpaired session. `PAIRING_NUMBER` is only the phone number used for first-time linking. Optional provider keys in the table can be added to Config Vars when needed. Do not commit `.env` or credentials.
 
 ## Environment variables
 
@@ -36,7 +36,7 @@ Heroku's filesystem is temporary, so durable PostgreSQL is mandatory. `DATABASE_
 | `DATABASE_URL` | Yes | Durable PostgreSQL connection string |
 | `OWNER_NUMBERS` | Yes for owner actions | Comma-separated owner numbers, international digits only |
 | `PAIRING_NUMBER` | First link only | Requests a short-lived WhatsApp pairing code in worker logs |
-| `SESSION_ID` | No | Optional stable label that selects an isolated PostgreSQL auth namespace; unset preserves existing sessions |
+| `SESSION_ID` | No | Optional stable label (1–64 letters, numbers, spaces, underscores, or hyphens) that selects an isolated PostgreSQL auth namespace; unset preserves existing sessions |
 | `BOT_MODE` | No | `private` (default) or `public`; private restricts text commands to owners |
 | `AUTO_REPLY` | No | `false` (default) or `true`; enables AI replies to non-owner text/captions in direct chats only; requires `OPENAI_API_KEY` |
 | `PREFIX` | No | Command prefix, default `.` |
